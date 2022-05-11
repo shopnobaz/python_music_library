@@ -1,0 +1,82 @@
+--(4) Skriv ut det äldsta albumet
+SELECT albums.title, MIN(albums.year_released) FROM albums;
+
+--(5) Skriv ut albumet med längts speltid
+SELECT al.title, SUM(so.duration) FROM albums AS al
+JOIN songs AS so
+ON al.id = so.album_id
+WHERE al.id=so.album_id
+GROUP BY al.title
+ORDER BY SUM(so.duration) DESC
+LIMIT 1;
+
+-- (6) Uppdatera albumet som saknar year_released med ett årtal
+UPDATE albums SET year_released = 2010 WHERE id = 7;
+
+--(7) Lägg till data via inmatning
+--Kunna skapa en artist
+--Kunna skapa album till en artist
+--Kunna lägga till låtar i ett album
+-- 7.1
+--INSERT INTO artists VALUES (NULL, :name, :description);
+
+--7.2
+--INSERT INTO albums VALUES (NULL, :title, :description, :year_released, :artist_id);
+
+--7.3
+-- INSERT INTO songs VALUES (NULL, :name, :duration, :album_id);
+
+--(9) Skriv ut medel-längden på en låt i ett album
+SELECT al.title, AVG(so.duration) FROM albums AS al
+JOIN songs AS so
+ON al.id = so.album_id
+WHERE al.id = 1;
+
+--(10) Visa den längsta låten från varje album
+SELECT so.name, MAX(so.duration) FROM albums AS al
+JOIN songs AS so
+ON al.id = so.album_id
+WHERE al.id = 1;
+
+-- (11) Visa antal låtar varje artist har
+SELECT ar.name, COUNT(so.id) FROM artists AS ar
+JOIN albums AS al
+ON ar.id = al.artist_id
+JOIN songs AS so
+ON al.id = so.album_id
+WHERE ar.id = 1;
+
+--(12) Kunna söka på artister via inmatning
+SELECT * FROM artists WHERE name LIKE '%br%';
+
+--(13) Kunna söka på låtar via inmatning
+SELECT songs.id, songs.name FROM songs WHERE name LIKE '%fo%';
+
+
+--(14) Kunna visa detaljer om en artist där man även ser artistens alla album
+SELECT ar.*, GROUP_CONCAT(al.title, ',  ') AS albums FROM artists AS ar
+JOIN albums AS al
+ON ar.id = al.artist_id
+GROUP BY ar.id, ar.name, ar.description;
+
+--(15) Kunna visa detaljer om ett album där man även ser albumets låtar
+SELECT al.*, GROUP_CONCAT(so.name, ', ') AS songs FROM albums AS al
+JOIN songs AS so
+ON al.id = so.album_id
+GROUP BY al.id, al.title, al.description;
+
+--(16) Detaljsidan för en artist och album visar även hur många låtar varje album har, och total speltid för ett album
+SELECT al.title, al.description, al.year_released, GROUP_CONCAT(so.name, ', '), COUNT(so.album_id), SUM(so.duration) FROM albums AS al
+JOIN songs AS so
+ON al.id = so.album_id
+WHERE al.id = 1
+GROUP BY al.title, al.description;
+
+--(17) Gör så att alla listor går att sortera på olika egenskaper, som name, year_released eller duration
+SELECT al.title, al.description, al.year_released, GROUP_CONCAT(so.name, ', '), COUNT(so.album_id), SUM(so.duration) FROM albums AS al
+JOIN songs AS so
+ON al.id = so.album_id
+GROUP BY al.title, al.description
+--ORDER BY al.title_released;
+--ORDER BY al.year_released;
+ORDER BY SUM(so.duration);
